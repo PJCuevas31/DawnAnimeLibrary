@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Runtime.InteropServices;
 using System.Xml.Linq;
 
-namespace AnimeManagement.API.Controllers
+namespace Anime.API.Controllers
 {
     [ApiController]
     [Route("api/anime")]
