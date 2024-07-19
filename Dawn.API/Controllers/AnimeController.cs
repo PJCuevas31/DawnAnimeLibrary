@@ -1,9 +1,6 @@
-﻿using AnimeManagementService;
 using Microsoft.AspNetCore.Mvc;
-using System.Runtime.InteropServices;
-using System.Xml.Linq;
 
-namespace Anime.API.Controllers
+namespace Dawn.API.Controllers
 {
     [ApiController]
     [Route("api/anime")]
