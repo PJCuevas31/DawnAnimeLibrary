@@ -1,0 +1,6 @@
+@Dawn.API_HostAddress = http://localhost:5113
+
+GET {{Dawn.API_HostAddress}}/animelist/
+Accept: application/json
+
+###
