@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
+using DawnModel; // Add this if Anime is in DawnModel namespace
+using DawnBL;   // Add this if DawnGetService and DawnTransactionService are in DawnBL namespace
 
 namespace Dawn.API.Controllers
 {
@@ -8,10 +10,10 @@ namespace Dawn.API.Controllers
     [Route("api/anime")]
     public class AnimeController : ControllerBase
     {
-        private readonly AnimeGetServices _animeGetServices;
-        private readonly AnimeTransactionServices _animeTransactionServices;
+        private readonly DawnGetService _animeGetServices;
+        private readonly DawnTransactionService _animeTransactionServices;
 
-        public AnimeController(AnimeGetServices animeGetServices, AnimeTransactionServices animeTransactionServices)
+        public AnimeController(DawnGetService animeGetServices, DawnTransactionService animeTransactionServices)
         {
             _animeGetServices = animeGetServices;
             _animeTransactionServices = animeTransactionServices;
@@ -20,7 +22,7 @@ namespace Dawn.API.Controllers
         [HttpGet]
         public ActionResult GetAnimes()
         {
-            var animes = _animeGetServices.GetAnimes();
+            var animes = _animeGetServices.GetAllAnime(); // Corrected method call to GetAllAnime
 
             var animeList = animes.Select(item => new Anime
             {
@@ -41,9 +43,9 @@ namespace Dawn.API.Controllers
                 return BadRequest("Invalid anime data.");
             }
 
-            if (_animeGetServices.AddAnime(anime))
+            if (_animeTransactionServices.AddAnime(anime) > 0)
             {
-                return CreatedAtAction(nameof(GetAnimes), new { name = request.AniName }, request);
+                return CreatedAtAction(nameof(GetAnimes), new { name = anime.AniName }, anime);
             }
             else
             {
@@ -52,16 +54,16 @@ namespace Dawn.API.Controllers
         }
 
         [HttpPatch("{AniName}")]
-        public IActionResult UpdateAnime([FromBody] Anime anime)
+        public IActionResult UpdateAnime(string AniName, [FromBody] Anime anime)
         {
-            if (anime == null || AniName != AniName)
+            if (anime == null || AniName != anime.AniName)
             {
                 return BadRequest("Invalid anime data.");
             }
 
-            var result = _animeTransactionServices.UpdateAnime(request.AniName, request.AniReleaseDate, request.AniStudio, request.AniGenre);
+            var result = _animeTransactionServices.UpdateAnime(anime);
 
-            if (_animeGetServices.UpdateAnime(anime)
+            if (result > 0)
             {
                 return Ok(anime);
             }
@@ -72,17 +74,17 @@ namespace Dawn.API.Controllers
         }
 
         [HttpDelete("{AniName}")]
-        public IActionResult DeleteAnime(Anime anime)
+        public IActionResult DeleteAnime(string AniName)
         {
             var result = _animeTransactionServices.DeleteAnime(AniName);
 
-            if (_animeGetServices(anime))
+            if (result > 0)
             {
                 return NoContent();
             }
             else
             {
-                return NotFound($"Anime with name '{anime}' not found.");
+                return NotFound($"Anime with name '{AniName}' not found.");
             }
         }
     }

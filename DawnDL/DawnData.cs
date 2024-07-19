@@ -30,9 +30,9 @@ namespace DawnDL
             return sqlData.UpdateAnime(anime.AniName, anime.AniReleaseDate, anime.AniStudio, anime.AniGenre);
         }
 
-        public int DeleteAnime(Anime anime)
+        public int DeleteAnime(string aniName)
         {
-            return sqlData.DeleteAnime(anime.AniName);
+            return sqlData.DeleteAnime(aniName);
         }
     }
 }

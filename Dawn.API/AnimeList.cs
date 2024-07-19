@@ -6,7 +6,7 @@ namespace Dawn.API
 
         public DateOnly AniReleaseDate { get; set; }
 
-        public string AniStudio { get; set; };
+        public string AniStudio { get; set; }
 
         public string AniGenre { get; set; }
     }
