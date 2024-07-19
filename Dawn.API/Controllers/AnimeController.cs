@@ -1,49 +1,96 @@
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Dawn.API.Controllers
 {
     [ApiController]
     [Route("api/anime")]
-    public class AnimeController : Controller
+    public class AnimeController : ControllerBase
     {
-        AnimeGetServices _animeGetServices;
-        AnimeTransactionServices _animeTransactionServices;
+        private readonly AnimeGetServices _animeGetServices;
+        private readonly AnimeTransactionServices _animeTransactionServices;
 
-        public AnimeController()
+        public AnimeController(AnimeGetServices animeGetServices, AnimeTransactionServices animeTransactionServices)
         {
-            _animeGetServices = new AnimeGetServices();
-            _animeTransactionServices = new AnimeTransactionServices();
+            _animeGetServices = animeGetServices;
+            _animeTransactionServices = animeTransactionServices;
         }
 
         [HttpGet]
-        public IEnumerable<AnimeManagement.API.Anime> GetAnimes()
+        public ActionResult<IEnumerable<Anime>> GetAnimes()
         {
             var animes = _animeGetServices.GetAnimes();
 
-            List<AnimeManagement.API.Anime> animeList = new List<Anime>();
-
-            foreach (var item in animes)
+            var animeList = animes.Select(item => new Anime
             {
-                animeList.Add(new API.Anime { AniName = item.AniName, AniReleaseDate = item.AniReleaseDate, AniStudio = item.AniStudio, AniGenre = item.AniGenre });
-            }
+                AniName = item.AniName,
+                AniReleaseDate = item.AniReleaseDate,
+                AniStudio = item.AniStudio,
+                AniGenre = item.AniGenre
+            }).ToList();
 
-            return animeList;
+            return Ok(animeList);
         }
 
         [HttpPost]
-        public JsonResult AddAnime(Anime request)
+        public IActionResult AddAnime([FromBody] Anime request)
         {
+            if (request == null || !ModelState.IsValid)
+            {
+                return BadRequest("Invalid anime data.");
+            }
+
             var result = _animeTransactionServices.CreateAnime(request.AniName, request.AniReleaseDate, request.AniStudio, request.AniGenre);
 
-            return new JsonResult(result);
+            if (result > 0)
+            {
+                return CreatedAtAction(nameof(GetAnimes), new { name = request.AniName }, request);
+            }
+            else
+            {
+                return StatusCode(500, "A problem occurred while handling your request.");
+            }
         }
 
         [HttpPatch]
-        public JsonResult UpdateAnime(Anime request)
+        public IActionResult UpdateAnime([FromBody] Anime request)
         {
+            if (request == null || !ModelState.IsValid)
+            {
+                return BadRequest("Invalid anime data.");
+            }
+
             var result = _animeTransactionServices.UpdateAnime(request.AniName, request.AniReleaseDate, request.AniStudio, request.AniGenre);
 
-            return new JsonResult(result);
+            if (result > 0)
+            {
+                return NoContent();
+            }
+            else
+            {
+                return StatusCode(500, "A problem occurred while handling your request.");
+            }
+        }
+
+        [HttpDelete]
+        public IActionResult DeleteAnime(Anime anime)
+        {
+            if (string.IsNullOrEmpty(anime))
+            {
+                return BadRequest("Anime name is required.");
+            }
+
+            var result = _animeTransactionServices.DeleteAnime(name);
+
+            if (result > 0)
+            {
+                return NoContent();
+            }
+            else
+            {
+                return NotFound($"Anime with name '{anime}' not found.");
+            }
         }
     }
 }
