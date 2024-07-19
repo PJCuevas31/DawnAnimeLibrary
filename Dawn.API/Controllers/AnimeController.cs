@@ -22,7 +22,7 @@ namespace Dawn.API.Controllers
         [HttpGet]
         public ActionResult GetAnimes()
         {
-            var animes = _animeGetServices.GetAllAnime(); // Corrected method call to GetAllAnime
+            var animes = _animeGetServices.GetAllAnime(); 
 
             var animeList = animes.Select(item => new Anime
             {
