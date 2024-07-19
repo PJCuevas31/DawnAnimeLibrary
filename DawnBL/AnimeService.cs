@@ -15,11 +15,11 @@ public class AnimeService
         AnimeRepository data = new AnimeRepository();
         return data.GetAnimes();
     }
-    public void AddAnime(Anime animex)
+    public void AddAnime(Anime anime)
     {
-        AniRep.Add(animex);
+        AniRep.Add(anime);
     }
-    public void DeleteAnime(Anime animex)
+    public void DeleteAnime(Anime anime)
     {
         AniRep.Remove(animex);
     }
