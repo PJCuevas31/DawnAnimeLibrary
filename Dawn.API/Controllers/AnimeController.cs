@@ -18,7 +18,7 @@ namespace Dawn.API.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<Anime>> GetAnimes()
+        public ActionResult GetAnimes()
         {
             var animes = _animeGetServices.GetAnimes();
 
@@ -34,16 +34,14 @@ namespace Dawn.API.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddAnime([FromBody] Anime request)
+        public IActionResult AddAnime([FromBody] Anime anime)
         {
-            if (request == null || !ModelState.IsValid)
+            if (anime == null)
             {
                 return BadRequest("Invalid anime data.");
             }
 
-            var result = _animeTransactionServices.CreateAnime(request.AniName, request.AniReleaseDate, request.AniStudio, request.AniGenre);
-
-            if (result > 0)
+            if (_animeGetServices.AddAnime(anime))
             {
                 return CreatedAtAction(nameof(GetAnimes), new { name = request.AniName }, request);
             }
@@ -53,19 +51,19 @@ namespace Dawn.API.Controllers
             }
         }
 
-        [HttpPatch]
-        public IActionResult UpdateAnime([FromBody] Anime request)
+        [HttpPatch("{AniName}")]
+        public IActionResult UpdateAnime([FromBody] Anime anime)
         {
-            if (request == null || !ModelState.IsValid)
+            if (anime == null || AniName != AniName)
             {
                 return BadRequest("Invalid anime data.");
             }
 
             var result = _animeTransactionServices.UpdateAnime(request.AniName, request.AniReleaseDate, request.AniStudio, request.AniGenre);
 
-            if (result > 0)
+            if (_animeGetServices.UpdateAnime(anime)
             {
-                return NoContent();
+                return Ok(anime);
             }
             else
             {
@@ -73,17 +71,12 @@ namespace Dawn.API.Controllers
             }
         }
 
-        [HttpDelete]
+        [HttpDelete("{AniName}")]
         public IActionResult DeleteAnime(Anime anime)
         {
-            if (string.IsNullOrEmpty(anime))
-            {
-                return BadRequest("Anime name is required.");
-            }
+            var result = _animeTransactionServices.DeleteAnime(AniName);
 
-            var result = _animeTransactionServices.DeleteAnime(name);
-
-            if (result > 0)
+            if (_animeGetServices(anime))
             {
                 return NoContent();
             }
