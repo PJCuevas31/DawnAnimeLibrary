@@ -1,38 +1,32 @@
-﻿using DawnModel;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using DawnModel;
 
 namespace DawnDL
 {
     public class DawnData
     {
-        List<Anime> animeList;
-        DawnSql sqlData;
+        private DawnSql _dawnSql = new DawnSql();
 
-        public DawnData()
+        public List<Anime> GetAnimes()
         {
-            animeList = new List<Anime>();
-            sqlData = new DawnSql();
-        }
-
-        public List<Anime> GetAnime()
-        {
-            animeList = sqlData.GetAnimes();
-            return animeList;
+            return _dawnSql.GetAnimes();
         }
 
         public int AddAnime(Anime anime)
         {
-            return sqlData.AddAnime(anime.AniName, anime.AniReleaseDate, anime.AniStudio, anime.AniGenre);
+            if (anime == null) return 0;
+            return _dawnSql.AddAnime(anime.AniName, anime.AniReleaseDate, anime.AniStudio, anime.AniGenre);
         }
 
         public int UpdateAnime(Anime anime)
         {
-            return sqlData.UpdateAnime(anime.AniName, anime.AniReleaseDate, anime.AniStudio, anime.AniGenre);
+            if (anime == null) return 0;
+            return _dawnSql.UpdateAnime(anime.AniName, anime.AniReleaseDate, anime.AniStudio, anime.AniGenre);
         }
 
         public int DeleteAnime(string aniName)
         {
-            return sqlData.DeleteAnime(aniName);
+            return _dawnSql.DeleteAnime(aniName);
         }
     }
 }
