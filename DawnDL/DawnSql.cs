@@ -42,7 +42,7 @@ namespace DawnDL
         {
             using (SqlConnection connection = new SqlConnection(_connectionString)) 
             {
-                string query = "INSERT INTO Animes (AniName, AniReleaseDate, AniStudio, AniGenre) VALUES (@AniName, @AniReleaseDate, @AniStudio, @AniGenre)";
+                string query = "INSERT INTO DawnAniListX (AniName, AniReleaseDate, AniStudio, AniGenre) VALUES (@AniName, @AniReleaseDate, @AniStudio, @AniGenre)";
                 SqlCommand command = new SqlCommand(query, connection); 
 
                 command.Parameters.AddWithValue("@AniName", aniName);
@@ -62,7 +62,7 @@ namespace DawnDL
         {
             using (SqlConnection connection = new SqlConnection(_connectionString)) 
             {
-                string query = "UPDATE Animes SET AniReleaseDate = @AniReleaseDate, AniStudio = @AniStudio, AniGenre = @AniGenre WHERE AniName = @AniName";
+                string query = "UPDATE DawnAniListX  SET AniReleaseDate = @AniReleaseDate, AniStudio = @AniStudio, AniGenre = @AniGenre WHERE AniName = @AniName";
                 SqlCommand command = new SqlCommand(query, connection); 
 
                 command.Parameters.AddWithValue("@AniName", aniName);
@@ -82,7 +82,7 @@ namespace DawnDL
         {
             using (SqlConnection connection = new SqlConnection(_connectionString)) 
             {
-                string query = "DELETE FROM Animes WHERE AniName = @AniName";
+                string query = "DELETE FROM DawnAniListX  WHERE AniName = @AniName";
                 SqlCommand command = new SqlCommand(query, connection); 
 
                 command.Parameters.AddWithValue("@AniName", aniName);
