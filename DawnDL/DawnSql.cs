@@ -7,7 +7,7 @@ namespace DawnDL
 {
     public class DawnSql
     {
-        string _connectionString = "Data Source=DESKTOP-N5OCNK2\\SQLEXPRESS;Initial Catalog=DawnDB;Integrated Security=True;";
+        string _connectionString = "Data Source=DESKTOP-N5OCNK2\\SQLEXPRESS;Initial Catalog=DawnAniListX;Integrated Security=True;";
 
         public List<Anime> GetAnimes()
         {
