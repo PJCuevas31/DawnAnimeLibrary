@@ -1,6 +1,6 @@
-﻿using DawnModel;
+﻿using System.Collections.Generic;
 using DawnDL;
-using System.Collections.Generic;
+using DawnModel;
 
 namespace DawnBL
 {
@@ -8,9 +8,9 @@ namespace DawnBL
     {
         private DawnData _dawnData = new DawnData();
 
-        public List<Anime> GetAllAnime()
+        public List<Anime> GetAnimes()
         {
-            return _dawnData.GetAnime();
+            return _dawnData.GetAnimes();
         }
     }
 }

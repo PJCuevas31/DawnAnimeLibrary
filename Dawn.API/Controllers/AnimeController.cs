@@ -1,90 +1,112 @@
-using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using DawnModel; 
-using DawnBL;   
+using Microsoft.AspNetCore.Mvc;
+using DawnBL;
+using DawnModel;
 
 namespace Dawn.API.Controllers
 {
+    [Route("api/[controller]")]
     [ApiController]
-    [Route("api/anime")]
     public class AnimeController : ControllerBase
     {
-        private readonly DawnGetService _animeGetServices;
-        private readonly DawnTransactionService _animeTransactionServices;
+        private readonly DawnGetService _dawnGetService;
+        private readonly DawnTransactionService _dawnTransactionService;
 
-        public AnimeController(DawnGetService animeGetServices, DawnTransactionService animeTransactionServices)
+        public AnimeController()
         {
-            _animeGetServices = animeGetServices;
-            _animeTransactionServices = animeTransactionServices;
+            _dawnGetService = new DawnGetService();
+            _dawnTransactionService = new DawnTransactionService();
         }
 
+        // GET api/anime
         [HttpGet]
-        public ActionResult GetAnimes()
+        public ActionResult<List<Anime>> GetAllAnimes()
         {
-            var animes = _animeGetServices.GetAllAnime(); 
-
-            var animeList = animes.Select(item => new Anime
+            try
             {
-                AniName = item.AniName,
-                AniReleaseDate = item.AniReleaseDate,
-                AniStudio = item.AniStudio,
-                AniGenre = item.AniGenre
-            }).ToList();
-
-            return Ok(animeList);
+                var animes = _dawnGetService.GetAnimes();
+                return Ok(animes);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
+        // POST api/anime
         [HttpPost]
-        public IActionResult AddAnime([FromBody] Anime anime)
+        public ActionResult AddAnime([FromBody] Anime anime)
         {
-            if (anime == null)
+            try
             {
-                return BadRequest("Invalid anime data.");
-            }
+                if (anime == null)
+                {
+                    return BadRequest("Anime object is null");
+                }
 
-            if (_animeTransactionServices.AddAnime(anime) > 0)
-            {
-                return CreatedAtAction(nameof(GetAnimes), new { name = anime.AniName }, anime);
+                int result = _dawnTransactionService.AddAnime(anime);
+                if (result > 0)
+                {
+                    return CreatedAtAction(nameof(GetAllAnimes), new { name = anime.AniName }, anime);
+                }
+                else
+                {
+                    return StatusCode(500, "Failed to add anime");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return StatusCode(500, "A problem occurred while handling your request.");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
 
-        [HttpPatch("{AniName}")]
-        public IActionResult UpdateAnime(string AniName, [FromBody] Anime anime)
+        // PATCH api/anime/{name}
+        [HttpPatch("{name}")]
+        public ActionResult UpdateAnime(string name, [FromBody] Anime anime)
         {
-            if (anime == null || AniName != anime.AniName)
+            try
             {
-                return BadRequest("Invalid anime data.");
-            }
+                if (anime == null || anime.AniName != name)
+                {
+                    return BadRequest("Invalid anime object or name mismatch");
+                }
 
-            var result = _animeTransactionServices.UpdateAnime(anime);
-
-            if (result > 0)
-            {
-                return Ok(anime);
+                int result = _dawnTransactionService.UpdateAnime(anime);
+                if (result > 0)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return StatusCode(500, $"Failed to update anime with name {name}");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return StatusCode(500, "A problem occurred while handling your request.");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
 
-        [HttpDelete("{AniName}")]
-        public IActionResult DeleteAnime(string AniName)
+        // DELETE api/anime/{name}
+        [HttpDelete("{name}")]
+        public ActionResult DeleteAnime(string name)
         {
-            var result = _animeTransactionServices.DeleteAnime(AniName);
-
-            if (result > 0)
+            try
             {
-                return NoContent();
+                int result = _dawnTransactionService.DeleteAnime(name);
+                if (result > 0)
+                {
+                    return NoContent();
+                }
+                else
+                {
+                    return NotFound($"Anime with name {name} not found");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return NotFound($"Anime with name '{AniName}' not found.");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
     }

@@ -1,5 +1,5 @@
-﻿using DawnModel;
-using DawnDL;
+﻿using DawnDL;
+using DawnModel;
 
 namespace DawnBL
 {

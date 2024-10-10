@@ -1,111 +1,98 @@
-﻿using DawnModel;
+﻿using Microsoft.Data.SqlClient; 
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
+using DawnModel;
 
 namespace DawnDL
 {
     public class DawnSql
     {
-        string connectionString = "Data Source=DESKTOP-POSRD7G\\SQLEXPRESS01; Initial Catalog=DawnListX; Integrated Security=True;";
-
-        SqlConnection sqlConnection;
-
-        public DawnSql()
-        {
-            sqlConnection = new SqlConnection(connectionString);
-        }
+        string _connectionString = "Data Source=DESKTOP-N5OCNK2\\SQLEXPRESS;Initial Catalog=DawnListX;Integrated Security=True;";
 
         public List<Anime> GetAnimes()
         {
-            string selectStatement = "SELECT AniName, AniReleaseDate, AniStudio, AniGenre FROM DawnAniListX";
-
-            SqlCommand selectCommand = new SqlCommand(selectStatement, sqlConnection);
-
-            sqlConnection.Open();
             List<Anime> animes = new List<Anime>();
 
-            SqlDataReader reader = selectCommand.ExecuteReader();
-
-            while (reader.Read())
+            using (SqlConnection connection = new SqlConnection(_connectionString)) 
             {
-                string aniName = reader["AniName"].ToString();
-                DateTime aniReleaseDate = Convert.ToDateTime(reader["AniReleaseDate"]);
-                string aniStudio = reader["AniStudio"].ToString();
-                string aniGenre = reader["AniGenre"].ToString();
+                string query = "SELECT AniName, AniReleaseDate, AniStudio, AniGenre FROM Animes";
+                SqlCommand command = new SqlCommand(query, connection); 
 
-                Anime readAnime = new Anime
+                connection.Open();
+                SqlDataReader reader = command.ExecuteReader(); 
+
+                while (reader.Read())
                 {
-                    AniName = aniName,
-                    AniReleaseDate = aniReleaseDate,
-                    AniStudio = aniStudio,
-                    AniGenre = aniGenre
-                };
-
-                animes.Add(readAnime);
+                    Anime anime = new Anime
+                    {
+                        AniName = reader["AniName"].ToString(),
+                        AniReleaseDate = Convert.ToDateTime(reader["AniReleaseDate"]),
+                        AniStudio = reader["AniStudio"].ToString(),
+                        AniGenre = reader["AniGenre"].ToString()
+                    };
+                    animes.Add(anime);
+                }
+                connection.Close();
             }
-
-            sqlConnection.Close();
 
             return animes;
         }
 
         public int AddAnime(string aniName, DateTime aniReleaseDate, string aniStudio, string aniGenre)
         {
-            int success;
+            using (SqlConnection connection = new SqlConnection(_connectionString)) 
+            {
+                string query = "INSERT INTO DawnAniListX (AniName, AniReleaseDate, AniStudio, AniGenre) VALUES (@AniName, @AniReleaseDate, @AniStudio, @AniGenre)";
+                SqlCommand command = new SqlCommand(query, connection); 
 
-            string insertStatement = "INSERT INTO DawnAniListX (AniName, AniReleaseDate, AniStudio, AniGenre) VALUES (@aniName, @aniReleaseDate, @aniStudio, @aniGenre)";
+                command.Parameters.AddWithValue("@AniName", aniName);
+                command.Parameters.AddWithValue("@AniReleaseDate", aniReleaseDate);
+                command.Parameters.AddWithValue("@AniStudio", aniStudio);
+                command.Parameters.AddWithValue("@AniGenre", aniGenre);
 
-            SqlCommand insertCommand = new SqlCommand(insertStatement, sqlConnection);
+                connection.Open();
+                int rowsAffected = command.ExecuteNonQuery();
+                connection.Close();
 
-            insertCommand.Parameters.AddWithValue("@aniName", aniName);
-            insertCommand.Parameters.AddWithValue("@aniReleaseDate", aniReleaseDate);
-            insertCommand.Parameters.AddWithValue("@aniStudio", aniStudio);
-            insertCommand.Parameters.AddWithValue("@aniGenre", aniGenre);
-            sqlConnection.Open();
-
-            success = insertCommand.ExecuteNonQuery();
-
-            sqlConnection.Close();
-
-            return success;
+                return rowsAffected;
+            }
         }
 
         public int UpdateAnime(string aniName, DateTime aniReleaseDate, string aniStudio, string aniGenre)
         {
-            int success;
+            using (SqlConnection connection = new SqlConnection(_connectionString)) 
+            {
+                string query = "UPDATE DawnAniListX  SET AniReleaseDate = @AniReleaseDate, AniStudio = @AniStudio, AniGenre = @AniGenre WHERE AniName = @AniName";
+                SqlCommand command = new SqlCommand(query, connection); 
 
-            string updateStatement = "UPDATE DawnAniListX SET AniReleaseDate = @aniReleaseDate, AniStudio = @aniStudio, AniGenre = @aniGenre WHERE AniName = @aniName";
-            SqlCommand updateCommand = new SqlCommand(updateStatement, sqlConnection);
-            sqlConnection.Open();
+                command.Parameters.AddWithValue("@AniName", aniName);
+                command.Parameters.AddWithValue("@AniReleaseDate", aniReleaseDate);
+                command.Parameters.AddWithValue("@AniStudio", aniStudio);
+                command.Parameters.AddWithValue("@AniGenre", aniGenre);
 
-            updateCommand.Parameters.AddWithValue("@aniName", aniName);
-            updateCommand.Parameters.AddWithValue("@aniReleaseDate", aniReleaseDate);
-            updateCommand.Parameters.AddWithValue("@aniStudio", aniStudio);
-            updateCommand.Parameters.AddWithValue("@aniGenre", aniGenre);
+                connection.Open();
+                int rowsAffected = command.ExecuteNonQuery();
+                connection.Close();
 
-            success = updateCommand.ExecuteNonQuery();
-
-            sqlConnection.Close();
-
-            return success;
+                return rowsAffected;
+            }
         }
 
         public int DeleteAnime(string aniName)
         {
-            int success;
+            using (SqlConnection connection = new SqlConnection(_connectionString)) 
+            {
+                string query = "DELETE FROM DawnAniListX  WHERE AniName = @AniName";
+                SqlCommand command = new SqlCommand(query, connection); 
 
-            string deleteStatement = "DELETE FROM DawnAniListX WHERE AniName = @aniName";
-            SqlCommand deleteCommand = new SqlCommand(deleteStatement, sqlConnection);
-            sqlConnection.Open();
+                command.Parameters.AddWithValue("@AniName", aniName);
 
-            deleteCommand.Parameters.AddWithValue("@aniName", aniName);
+                connection.Open();
+                int rowsAffected = command.ExecuteNonQuery();
+                connection.Close();
 
-            success = deleteCommand.ExecuteNonQuery();
-
-            sqlConnection.Close();
-
-            return success;
+                return rowsAffected;
+            }
         }
     }
 }

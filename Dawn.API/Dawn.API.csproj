@@ -10,4 +10,15 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="DawnBL">
+      <HintPath>..\DawnBL\bin\Debug\net8.0\DawnBL.dll</HintPath>
+    </Reference>
+    <Reference Include="DawnModel">
+      <HintPath>..\DawnModel\bin\Debug\net8.0\DawnModel.dll</HintPath>
+    </Reference>
+	  <ProjectReference Include="..\DawnBL\DawnBL.csproj" />
+	  <ProjectReference Include="..\DawnModel\DawnModel.csproj" />
+  </ItemGroup>
+
 </Project>
